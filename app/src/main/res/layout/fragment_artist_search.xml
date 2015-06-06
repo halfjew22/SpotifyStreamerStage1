@@ -1,0 +1,24 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_margin="16dp"
+              android:orientation="vertical"
+              tools:context="com.lustig.spotifystreamerstage1.fragments.FragmentArtistSearch">
+
+    <EditText
+        android:id="@+id/etArtistSearch"
+        android:singleLine="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/enter_artist_name"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Just making sure the cards look good before
+     implementing a RecyclerView with them -->
+    <include layout="@layout/item_view_artist" />
+
+    <include layout="@layout/item_view_artist" />
+
+    <include layout="@layout/item_view_artist" />
+</LinearLayout>
