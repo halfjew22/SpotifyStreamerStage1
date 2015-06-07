@@ -20,11 +20,11 @@
     <TextView
         android:id="@+id/tvArtistName"
         android:gravity="center"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/small_artist_image"
+        android:layout_margin="16dp"
         android:layout_width="wrap_content"
         android:text="Artist Name"
         android:textSize="18sp"
-        android:layout_alignBottom="@+id/ivArtistImage"
         android:layout_toRightOf="@+id/ivArtistImage"
         android:layout_toEndOf="@+id/ivArtistImage"/>
 

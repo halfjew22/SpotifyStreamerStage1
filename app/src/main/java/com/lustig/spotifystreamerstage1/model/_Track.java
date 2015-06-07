@@ -1,11 +1,18 @@
 package com.lustig.spotifystreamerstage1.model;
 
-public class Track {
+import kaaes.spotify.webapi.android.models.Track;
+
+public class _Track {
 
     String mTitle;
     String mAlbum;
+    String mImageUrl;
 
-    public Track(String title, String album) {
+    public _Track(Track apiTrack) {
+
+    }
+
+    public _Track(String title, String album) {
         mTitle = title;
         mAlbum = album;
     }
