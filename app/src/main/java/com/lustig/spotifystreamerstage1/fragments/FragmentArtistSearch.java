@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.lustig.spotifystreamerstage1.R;
 import com.lustig.spotifystreamerstage1.activities.MainActivity;
@@ -43,6 +44,10 @@ public class FragmentArtistSearch extends Fragment {
     ArtistAdapter mAdapter;
 
     SpotifyService mSpotify;
+
+    Toast mNoArtistToast;
+
+    Boolean shouldShowToast = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -91,13 +96,14 @@ public class FragmentArtistSearch extends Fragment {
                                     @Override
                                     public void success(ArtistsPager artistsPager, Response response) {
 
+                                        if (artistsPager.artists.items.size() == 0) {
+                                            shouldShowToast = true;
+                                        }
+
                                         final ArrayList<_Artist> _artists = new ArrayList<_Artist>();
 
                                         List<Artist> artists = artistsPager.artists.items;
                                         for (kaaes.spotify.webapi.android.models.Artist a : artists) {
-                                            d(a.name);
-
-
                                             _artists.add(new _Artist(a));
                                         }
 
@@ -106,6 +112,17 @@ public class FragmentArtistSearch extends Fragment {
 
                                                     @Override
                                                     public void run() {
+                                                        if (shouldShowToast) {
+                                                            if (mNoArtistToast != null) {
+                                                                mNoArtistToast.cancel();
+                                                            }
+                                                            mNoArtistToast = Toast.makeText(
+                                                                    getActivity(),
+                                                                    "No artists found =(",
+                                                                    Toast.LENGTH_SHORT);
+                                                            mNoArtistToast.show();
+                                                        }
+
                                                         mAdapter = new ArtistAdapter(_artists, getActivity());
                                                         mAdapter.setArtistClickListener((MainActivity) getActivity());
                                                         mRecyclerView.setAdapter(mAdapter);

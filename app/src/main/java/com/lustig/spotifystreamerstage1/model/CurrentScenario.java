@@ -2,8 +2,10 @@ package com.lustig.spotifystreamerstage1.model;
 
 public class CurrentScenario {
 
-    _Artist mCurrentArtist;
     String mArtistSearchText;
+
+    _Artist mCurrentArtist;
+    _Track mCurrentTrack;
 
     private static CurrentScenario ourInstance = new CurrentScenario();
 
@@ -18,19 +20,27 @@ public class CurrentScenario {
 
     private CurrentScenario() {}
 
+    public void setArtistSearchText(String artistSearchText) {
+        mArtistSearchText = artistSearchText;
+    }
+
     public void setCurrentArtist(_Artist artist) {
         mCurrentArtist = artist;
     }
 
-    public void setArtistSearchText(String artistSearchText) {
-        mArtistSearchText = artistSearchText;
+    public void setCurrentTrack(_Track currentTrack) {
+        mCurrentTrack = currentTrack;
+    }
+
+    public String getArtistSearchText() {
+        return mArtistSearchText;
     }
 
     public _Artist getCurrentArtist() {
         return mCurrentArtist;
     }
 
-    public String getArtistSearchText() {
-        return mArtistSearchText;
+    public _Track getCurrentTrack() {
+        return mCurrentTrack;
     }
 }

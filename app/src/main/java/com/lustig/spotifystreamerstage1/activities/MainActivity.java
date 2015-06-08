@@ -3,7 +3,6 @@ package com.lustig.spotifystreamerstage1.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.lustig.spotifystreamerstage1.R;
@@ -19,10 +18,6 @@ public class MainActivity extends AppCompatActivity implements OnArtistClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
-
-    void d(String msg) {
-        Log.d("MainActivity", msg);
     }
 
     /**

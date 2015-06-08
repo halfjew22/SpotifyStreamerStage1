@@ -5,17 +5,17 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.lustig.spotifystreamerstage1.R;
+import com.lustig.spotifystreamerstage1.activities.TopTracksActivity;
 import com.lustig.spotifystreamerstage1.adapters.TrackAdapter;
 import com.lustig.spotifystreamerstage1.api.SpotifyHelper;
 import com.lustig.spotifystreamerstage1.model.CurrentScenario;
 import com.lustig.spotifystreamerstage1.model._Track;
+import com.lustig.spotifystreamerstage1.utility.U;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,19 +27,17 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment to display top tracks from a selected artist
  */
 public class FragmentTopTracks extends Fragment {
+
+    View mRootLayout;
 
     RecyclerView mRecyclerView;
 
     TrackAdapter mAdapter;
 
     ArrayList<_Track> mTracks;
-
-    TextView mText;
-
-    public static final String TAG = "FragmentTopTracks";
 
     public FragmentTopTracks() {
         // Required empty public constructor
@@ -51,15 +49,18 @@ public class FragmentTopTracks extends Fragment {
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_top_tracks, container, false);
+        mRootLayout = inflater.inflate(R.layout.fragment_top_tracks, container, false);
 
-        mRecyclerView = (RecyclerView) v.findViewById(R.id.rvTopTracks);
+        setUpRecyclerView();
 
-        mRecyclerView.setHasFixedSize(true);
+        loadTracks();
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        return mRootLayout;
+    }
 
-        mTracks = new ArrayList<_Track>();
+    private void loadTracks() {
+
+        mTracks = new ArrayList<>();
 
         HashMap<String, Object> map = new HashMap<>();
 
@@ -77,10 +78,11 @@ public class FragmentTopTracks extends Fragment {
                             public void success(Tracks tracks, Response response) {
 
                                 for (Track t : tracks.tracks) {
-                                    d(t.name.toString());
+
                                     mTracks.add(new _Track(t));
 
                                     mAdapter = new TrackAdapter(mTracks, getActivity());
+                                    mAdapter.setOnTrackClickListener((TopTracksActivity) getActivity());
                                 }
 
                                 getActivity().runOnUiThread(
@@ -88,6 +90,7 @@ public class FragmentTopTracks extends Fragment {
 
                                             @Override
                                             public void run() {
+
                                                 mRecyclerView.setAdapter(mAdapter);
                                             }
                                         });
@@ -96,14 +99,17 @@ public class FragmentTopTracks extends Fragment {
                             @Override
                             public void failure(RetrofitError error) {
 
+                                U.d(error.getBody().toString());
                             }
                         });
-
-        return v;
     }
 
-    void d(String msg) {
+    private void setUpRecyclerView() {
 
-        Log.d(TAG, msg);
+        mRecyclerView = (RecyclerView) mRootLayout.findViewById(R.id.rvTopTracks);
+
+        mRecyclerView.setHasFixedSize(true);
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 }

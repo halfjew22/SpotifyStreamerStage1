@@ -42,10 +42,23 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackViewHolder> {
         final _Track currentTrack = mTracks.get(position);
 
         trackViewHolder.setTrackDetails(currentTrack);
+
+        trackViewHolder.setOnClickListener(
+                new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        mTrackClickListener.onTrackClick(currentTrack);
+                    }
+                });
     }
 
     @Override
     public int getItemCount() {
         return mTracks.size();
+    }
+
+    public void setOnTrackClickListener(OnTrackClickListener listener) {
+        mTrackClickListener = listener;
     }
 }
