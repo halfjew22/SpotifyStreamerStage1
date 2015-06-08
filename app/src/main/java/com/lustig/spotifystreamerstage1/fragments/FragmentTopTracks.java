@@ -3,6 +3,8 @@ package com.lustig.spotifystreamerstage1.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +12,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.lustig.spotifystreamerstage1.R;
+import com.lustig.spotifystreamerstage1.adapters.TrackAdapter;
 import com.lustig.spotifystreamerstage1.api.SpotifyHelper;
 import com.lustig.spotifystreamerstage1.model.CurrentScenario;
+import com.lustig.spotifystreamerstage1.model._Track;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +31,11 @@ import retrofit.client.Response;
  */
 public class FragmentTopTracks extends Fragment {
 
-    ArrayList<String> mTrackNames;
+    RecyclerView mRecyclerView;
+
+    TrackAdapter mAdapter;
+
+    ArrayList<_Track> mTracks;
 
     TextView mText;
 
@@ -45,7 +53,13 @@ public class FragmentTopTracks extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_top_tracks, container, false);
 
-        mTrackNames = new ArrayList<String>();
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.rvTopTracks);
+
+        mRecyclerView.setHasFixedSize(true);
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        mTracks = new ArrayList<_Track>();
 
         HashMap<String, Object> map = new HashMap<>();
 
@@ -64,7 +78,9 @@ public class FragmentTopTracks extends Fragment {
 
                                 for (Track t : tracks.tracks) {
                                     d(t.name.toString());
-                                    mTrackNames.add(t.name);
+                                    mTracks.add(new _Track(t));
+
+                                    mAdapter = new TrackAdapter(mTracks, getActivity());
                                 }
 
                                 getActivity().runOnUiThread(
@@ -72,10 +88,7 @@ public class FragmentTopTracks extends Fragment {
 
                                             @Override
                                             public void run() {
-
-                                                for (String name : mTrackNames) {
-                                                    mText.append(name + "\n");
-                                                }
+                                                mRecyclerView.setAdapter(mAdapter);
                                             }
                                         });
                             }
@@ -85,10 +98,6 @@ public class FragmentTopTracks extends Fragment {
 
                             }
                         });
-
-        mText = (TextView) v.findViewById(R.id.text);
-
-        mText.setText(CurrentScenario.getInstance().getCurrentArtist().getName() + "\n");
 
         return v;
     }

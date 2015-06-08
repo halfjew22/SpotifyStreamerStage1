@@ -4,11 +4,9 @@
              android:layout_height="match_parent"
              tools:context="com.lustig.spotifystreamerstage1.fragments.FragmentTopTracks">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:id="@+id/text"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvTopTracks"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment"/>
+        android:layout_height="match_parent" />
 
 </FrameLayout>

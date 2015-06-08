@@ -16,6 +16,7 @@ import com.lustig.spotifystreamerstage1.R;
 import com.lustig.spotifystreamerstage1.activities.MainActivity;
 import com.lustig.spotifystreamerstage1.adapters.ArtistAdapter;
 import com.lustig.spotifystreamerstage1.api.SpotifyHelper;
+import com.lustig.spotifystreamerstage1.model.CurrentScenario;
 import com.lustig.spotifystreamerstage1.model._Artist;
 
 import java.util.ArrayList;
@@ -82,6 +83,8 @@ public class FragmentArtistSearch extends Fragment {
 
                         d(s.toString());
 
+                        CurrentScenario.getInstance().setArtistSearchText(s.toString());
+
                         mSpotify.searchArtists(
                                 s.toString(), new Callback<ArtistsPager>() {
 
@@ -93,10 +96,10 @@ public class FragmentArtistSearch extends Fragment {
                                         List<Artist> artists = artistsPager.artists.items;
                                         for (kaaes.spotify.webapi.android.models.Artist a : artists) {
                                             d(a.name);
+
+
                                             _artists.add(new _Artist(a));
                                         }
-
-
 
                                         getActivity().runOnUiThread(
                                                 new Runnable() {
@@ -148,5 +151,17 @@ public class FragmentArtistSearch extends Fragment {
     void d(String msg) {
 
         Log.d("FragmentArtistSearch", msg);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        String searchText =
+                CurrentScenario.getInstance().getArtistSearchText();
+
+        if (searchText != null) {
+            mArtistSearch.setText(searchText);
+        }
     }
 }

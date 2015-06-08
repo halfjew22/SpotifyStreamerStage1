@@ -7,18 +7,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.lustig.spotifystreamerstage1.R;
-import com.lustig.spotifystreamerstage1.api.SpotifyHelper;
 import com.lustig.spotifystreamerstage1.interfaces.OnArtistClickListener;
 import com.lustig.spotifystreamerstage1.model.CurrentScenario;
 import com.lustig.spotifystreamerstage1.model._Artist;
-
-import java.util.List;
-
-import kaaes.spotify.webapi.android.models.Artist;
-import kaaes.spotify.webapi.android.models.ArtistsPager;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class MainActivity extends AppCompatActivity implements OnArtistClickListener {
 
@@ -26,31 +17,8 @@ public class MainActivity extends AppCompatActivity implements OnArtistClickList
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        SpotifyHelper.getInstance().getService().searchArtists(
-                "The Used", new Callback<ArtistsPager>() {
-
-                    @Override
-                    public void success(ArtistsPager artistsPager, Response response) {
-
-                        List<Artist> artists = artistsPager.artists.items;
-                        for (kaaes.spotify.webapi.android.models.Artist a : artists) {
-                            d(a.name);
-                            d(a.href);
-                            d(a.uri);
-                        }
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-
-                    }
-                });
-
     }
 
     void d(String msg) {
