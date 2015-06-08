@@ -14,10 +14,11 @@ import com.lustig.spotifystreamerstage1.activities.TopTracksActivity;
 import com.lustig.spotifystreamerstage1.adapters.TrackAdapter;
 import com.lustig.spotifystreamerstage1.api.SpotifyHelper;
 import com.lustig.spotifystreamerstage1.model.CurrentScenario;
+import com.lustig.spotifystreamerstage1.model.TrackList;
+import com.lustig.spotifystreamerstage1.model._Artist;
 import com.lustig.spotifystreamerstage1.model._Track;
 import com.lustig.spotifystreamerstage1.utility.U;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import kaaes.spotify.webapi.android.models.Track;
@@ -33,11 +34,14 @@ public class FragmentTopTracks extends Fragment {
 
     View mRootLayout;
 
+    _Artist mArtist;
+    String mArtistUri;
+
     RecyclerView mRecyclerView;
 
     TrackAdapter mAdapter;
 
-    ArrayList<_Track> mTracks;
+    TrackList mTracks;
 
     public FragmentTopTracks() {
         // Required empty public constructor
@@ -47,11 +51,8 @@ public class FragmentTopTracks extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        if (savedInstanceState == null) {
-            U.d("TracksFragment savedInstanceState is null");
-        } else {
-            U.d("TracksFragment savedInstanceState is NOT null");
-        }
+        mArtist = CurrentScenario.getInstance().getCurrentArtist();
+        mArtistUri = mArtist.getUri();
 
         // Inflate the layout for this fragment
         mRootLayout = inflater.inflate(R.layout.fragment_top_tracks, container, false);
@@ -63,51 +64,84 @@ public class FragmentTopTracks extends Fragment {
         return mRootLayout;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        U.d("onPause");
+
+        mTracks.saveTracksToSharedPrefs();
+    }
+
     private void loadTracks() {
 
-        mTracks = new ArrayList<>();
+        mTracks = new TrackList(mArtist, getActivity());
 
-        HashMap<String, Object> map = new HashMap<>();
 
-        map.put("country", "US");
+        if (mTracks.getTracks().size() == 0) {
 
-        SpotifyHelper
-                .getInstance()
-                .getService()
-                .getArtistTopTrack(
-                        CurrentScenario.getInstance().getCurrentArtist().getUri(),
-                        map,
-                        new Callback<Tracks>() {
+            U.d("Loading Tracks from internet");
 
-                            @Override
-                            public void success(Tracks tracks, Response response) {
+            /**
+             * Before I go through the process of loading these tracks from the
+             * Internet, I'm going to check SharedPreferences to see if I've
+             *
+             */
+            HashMap<String, Object> map = new HashMap<>();
 
-                                for (Track t : tracks.tracks) {
+            map.put("country", "US");
 
-                                    mTracks.add(new _Track(t));
+            SpotifyHelper
+                    .getInstance()
+                    .getService()
+                    .getArtistTopTrack(
+                            mArtistUri,
+                            map,
+                            new Callback<Tracks>() {
 
-                                    mAdapter = new TrackAdapter(mTracks, getActivity());
-                                    mAdapter.setOnTrackClickListener((TopTracksActivity) getActivity());
+                                @Override
+                                public void success(Tracks tracks, Response response) {
+
+                                    for (Track t : tracks.tracks) {
+
+                                        mTracks.add(new _Track(t));
+
+                                        mAdapter = new TrackAdapter(mTracks, getActivity());
+                                        mAdapter.setOnTrackClickListener((TopTracksActivity) getActivity());
+                                    }
+
+                                    getActivity().runOnUiThread(
+                                            new Runnable() {
+
+                                                @Override
+                                                public void run() {
+
+                                                    mRecyclerView.setAdapter(mAdapter);
+                                                }
+                                            });
                                 }
 
-                                getActivity().runOnUiThread(
-                                        new Runnable() {
+                                @Override
+                                public void failure(RetrofitError error) {
 
-                                            @Override
-                                            public void run() {
+                                    U.d(error.getBody().toString());
+                                }
+                            });
+        } else {
+            U.d("Loaded Tracks from SharedPrefs");
 
-                                                mRecyclerView.setAdapter(mAdapter);
-                                            }
-                                        });
-                            }
+            for (_Track track : mTracks.getTracks()) {
+                U.d(track.getTitle());
+            }
 
-                            @Override
-                            public void failure(RetrofitError error) {
+            mAdapter = new TrackAdapter(mTracks, getActivity());
+            mAdapter.setOnTrackClickListener((TopTracksActivity) getActivity());
+            mRecyclerView.setAdapter(mAdapter);
+        }
 
-                                U.d(error.getBody().toString());
-                            }
-                        });
     }
+
+
 
     private void setUpRecyclerView() {
 

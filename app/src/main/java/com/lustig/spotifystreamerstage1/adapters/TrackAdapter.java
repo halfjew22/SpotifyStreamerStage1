@@ -9,19 +9,18 @@ import android.view.ViewGroup;
 
 import com.lustig.spotifystreamerstage1.R;
 import com.lustig.spotifystreamerstage1.interfaces.OnTrackClickListener;
+import com.lustig.spotifystreamerstage1.model.TrackList;
 import com.lustig.spotifystreamerstage1.model._Track;
 import com.lustig.spotifystreamerstage1.viewholders.TrackViewHolder;
 
-import java.util.ArrayList;
-
 public class TrackAdapter extends RecyclerView.Adapter<TrackViewHolder> {
 
-    ArrayList<_Track> mTracks;
+    TrackList mTracks;
     Context mContext;
 
     OnTrackClickListener mTrackClickListener;
 
-    public TrackAdapter(ArrayList<_Track> tracks, Context context) {
+    public TrackAdapter(TrackList tracks, Context context) {
         mTracks = tracks;
         mContext = context;
     }
