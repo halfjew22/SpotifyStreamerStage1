@@ -43,10 +43,15 @@ public class FragmentTopTracks extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        if (savedInstanceState == null) {
+            U.d("TracksFragment savedInstanceState is null");
+        } else {
+            U.d("TracksFragment savedInstanceState is NOT null");
+        }
 
         // Inflate the layout for this fragment
         mRootLayout = inflater.inflate(R.layout.fragment_top_tracks, container, false);

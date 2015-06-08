@@ -15,6 +15,12 @@ public class TopTracksActivity extends AppCompatActivity implements OnTrackClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_top_tracks);
+
+        if (savedInstanceState == null) {
+            U.d("Activity: savedInstanceState is null");
+        } else {
+            U.d("Activity: savedInstanceState is NOT null");
+        }
     }
 
     @Override
