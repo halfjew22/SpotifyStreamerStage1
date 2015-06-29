@@ -12,25 +12,15 @@ import android.view.ViewGroup;
 import com.lustig.spotifystreamerstage1.R;
 import com.lustig.spotifystreamerstage1.activities.TopTracksActivity;
 import com.lustig.spotifystreamerstage1.adapters.TrackAdapter;
-import com.lustig.spotifystreamerstage1.api.SpotifyHelper;
+import com.lustig.spotifystreamerstage1.interfaces.TrackLoadingListener;
 import com.lustig.spotifystreamerstage1.model.CurrentScenario;
 import com.lustig.spotifystreamerstage1.model.TrackList;
 import com.lustig.spotifystreamerstage1.model._Artist;
-import com.lustig.spotifystreamerstage1.model._Track;
-import com.lustig.spotifystreamerstage1.utility.U;
-
-import java.util.HashMap;
-
-import kaaes.spotify.webapi.android.models.Track;
-import kaaes.spotify.webapi.android.models.Tracks;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 /**
  * Fragment to display top tracks from a selected artist
  */
-public class FragmentTopTracks extends Fragment {
+public class FragmentTopTracks extends Fragment implements TrackLoadingListener {
 
     View mRootLayout;
 
@@ -51,6 +41,23 @@ public class FragmentTopTracks extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        /**
+         * So, instead of opting for savedInstanceState management,
+         * I've implemented a TrackList class that handles saving to
+         * SharedPreferences on command.
+         *
+         * Whenever a user clicks on an artist they haven't clicked
+         * before, I load the track list from the API. Once anything
+         * causes the user to navigate away from the track listing,
+         * I save the TrackList to SharedPrefs to be recalled next
+         * time it needs to load. I could use a more efficient approach
+         * than Gson / Json / SharedPrefs, but for the simplicity
+         * of this project, I feel they suffice.
+         *
+         * So, although I don't handle sharedPrefs, I do take into
+         * account orientation changes and storing the data thusly.
+         */
+
         mArtist = CurrentScenario.getInstance().getCurrentArtist();
         mArtistUri = mArtist.getUri();
 
@@ -59,7 +66,7 @@ public class FragmentTopTracks extends Fragment {
 
         setUpRecyclerView();
 
-        loadTracks();
+        mTracks = new TrackList(mArtist, getActivity(), this);
 
         return mRootLayout;
     }
@@ -68,80 +75,8 @@ public class FragmentTopTracks extends Fragment {
     public void onPause() {
         super.onPause();
 
-        U.d("onPause");
-
         mTracks.saveTracksToSharedPrefs();
     }
-
-    private void loadTracks() {
-
-        mTracks = new TrackList(mArtist, getActivity());
-
-
-        if (mTracks.getTracks().size() == 0) {
-
-            U.d("Loading Tracks from internet");
-
-            /**
-             * Before I go through the process of loading these tracks from the
-             * Internet, I'm going to check SharedPreferences to see if I've
-             *
-             */
-            HashMap<String, Object> map = new HashMap<>();
-
-            map.put("country", "US");
-
-            SpotifyHelper
-                    .getInstance()
-                    .getService()
-                    .getArtistTopTrack(
-                            mArtistUri,
-                            map,
-                            new Callback<Tracks>() {
-
-                                @Override
-                                public void success(Tracks tracks, Response response) {
-
-                                    for (Track t : tracks.tracks) {
-
-                                        mTracks.add(new _Track(t));
-
-                                        mAdapter = new TrackAdapter(mTracks, getActivity());
-                                        mAdapter.setOnTrackClickListener((TopTracksActivity) getActivity());
-                                    }
-
-                                    getActivity().runOnUiThread(
-                                            new Runnable() {
-
-                                                @Override
-                                                public void run() {
-
-                                                    mRecyclerView.setAdapter(mAdapter);
-                                                }
-                                            });
-                                }
-
-                                @Override
-                                public void failure(RetrofitError error) {
-
-                                    U.d(error.getBody().toString());
-                                }
-                            });
-        } else {
-            U.d("Loaded Tracks from SharedPrefs");
-
-            for (_Track track : mTracks.getTracks()) {
-                U.d(track.getTitle());
-            }
-
-            mAdapter = new TrackAdapter(mTracks, getActivity());
-            mAdapter.setOnTrackClickListener((TopTracksActivity) getActivity());
-            mRecyclerView.setAdapter(mAdapter);
-        }
-
-    }
-
-
 
     private void setUpRecyclerView() {
 
@@ -150,5 +85,38 @@ public class FragmentTopTracks extends Fragment {
         mRecyclerView.setHasFixedSize(true);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    @Override
+    public void onLoadingComplete(TrackList tracks) {
+
+        /**
+         * So, before I was trying to use this callback
+         * to figure out when the tracks were done loading.
+         *
+         * I was loading them properly in my TrackList class,
+         * but was getting a NPE in my TrackAdapter class
+         * when the RecyclerView was trying to get the size
+         * of my dataset.
+         *
+         * I'm still not sure what was happening, maybe it
+         * has to do with callbacks and object references,
+         * but when I pass the TrackList object who has
+         * completed loading, everything works as expected.
+         */
+        mTracks = tracks;
+
+        mAdapter = new TrackAdapter(mTracks, getActivity());
+        mAdapter.setOnTrackClickListener((TopTracksActivity) getActivity());
+
+        getActivity().runOnUiThread(
+                new Runnable() {
+
+                    @Override
+                    public void run() {
+
+                        mRecyclerView.setAdapter(mAdapter);
+                    }
+                });
     }
 }

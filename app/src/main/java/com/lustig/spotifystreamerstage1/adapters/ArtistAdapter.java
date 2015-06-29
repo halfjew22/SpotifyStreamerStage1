@@ -22,7 +22,8 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistViewHolder> {
     OnArtistClickListener mArtistClickListener;
 
     public ArtistAdapter(Context context) {
-        this(getDummyArtistData(), context);
+        mContext = context;
+        mArtists = new ArrayList<_Artist>();
     }
 
     public ArtistAdapter(ArrayList<_Artist> artists, Context context) {

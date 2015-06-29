@@ -86,8 +86,6 @@ public class FragmentArtistSearch extends Fragment {
                     @Override
                     public void afterTextChanged(Editable s) {
 
-                        d(s.toString());
-
                         CurrentScenario.getInstance().setArtistSearchText(s.toString());
 
                         mSpotify.searchArtists(
@@ -98,6 +96,8 @@ public class FragmentArtistSearch extends Fragment {
 
                                         if (artistsPager.artists.items.size() == 0) {
                                             shouldShowToast = true;
+                                        } else {
+                                            shouldShowToast = false;
                                         }
 
                                         final ArrayList<_Artist> _artists = new ArrayList<_Artist>();
@@ -112,10 +112,13 @@ public class FragmentArtistSearch extends Fragment {
 
                                                     @Override
                                                     public void run() {
+                                                        if (mNoArtistToast != null) {
+
+                                                            mNoArtistToast.cancel();
+                                                        }
+
                                                         if (shouldShowToast) {
-                                                            if (mNoArtistToast != null) {
-                                                                mNoArtistToast.cancel();
-                                                            }
+
                                                             mNoArtistToast = Toast.makeText(
                                                                     getActivity(),
                                                                     "No artists found =(",
