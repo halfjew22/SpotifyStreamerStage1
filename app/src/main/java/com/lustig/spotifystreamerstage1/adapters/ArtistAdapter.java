@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.lustig.spotifystreamerstage1.R;
+import com.lustig.spotifystreamerstage1.fragments.FragmentArtistSearch;
 import com.lustig.spotifystreamerstage1.interfaces.OnArtistClickListener;
 import com.lustig.spotifystreamerstage1.model._Artist;
 import com.lustig.spotifystreamerstage1.viewholders.ArtistViewHolder;
@@ -18,17 +19,24 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistViewHolder> {
 
     ArrayList<_Artist> mArtists;
     Context mContext;
+    FragmentArtistSearch mArtistSearchFragment;
 
     OnArtistClickListener mArtistClickListener;
 
-    public ArtistAdapter(Context context) {
+    int mLastSelectedPosition = -1;
+
+    public ArtistAdapter(Context context, FragmentArtistSearch fragment) {
         mContext = context;
         mArtists = new ArrayList<_Artist>();
+
+        mArtistSearchFragment = fragment;
     }
 
-    public ArtistAdapter(ArrayList<_Artist> artists, Context context) {
+    public ArtistAdapter(ArrayList<_Artist> artists, Context context, FragmentArtistSearch fragment) {
         mArtists = artists;
         mContext = context;
+
+        mArtistSearchFragment = fragment;
     }
 
     @Override
@@ -42,21 +50,33 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(ArtistViewHolder artistViewHolder, final int position) {
+    public void onBindViewHolder(final ArtistViewHolder artistViewHolder, final int position) {
 
         final _Artist currentArtist = mArtists.get(position);
+
+        artistViewHolder.getRootView()
+                        .setSelected(artistViewHolder.selectedArtists.get(position, false));
 
         artistViewHolder.setArtistDetails(currentArtist);
 
         artistViewHolder.setOnClickListener(
                 new View.OnClickListener() {
 
+
+
                     @Override
                     public void onClick(View v) {
+
+                        d(mLastSelectedPosition + "");
+                        d(position + "");
+
+                        mArtistSearchFragment.updateSelections(position, mLastSelectedPosition);
+
+                        mLastSelectedPosition = position;
+
                         mArtistClickListener.onArtistClick(currentArtist);
                     }
                 });
-
     }
 
     public static ArrayList<_Artist> getDummyArtistData() {

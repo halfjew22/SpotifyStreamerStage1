@@ -2,6 +2,7 @@ package com.lustig.spotifystreamerstage1.viewholders;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -20,8 +21,12 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder {
     private ImageView mArtistImage;
     private TextView mArtistName;
 
+    public SparseBooleanArray selectedArtists;
+
     public ArtistViewHolder(View itemView) {
         super(itemView);
+
+        selectedArtists = new SparseBooleanArray();
 
         mRootView = (RelativeLayout) itemView.findViewById(R.id.artistItemRoot);
 
@@ -31,15 +36,11 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder {
         mArtistName = (TextView) itemView.findViewById(R.id.tvArtistName);
     }
 
-    // ToDo figure out params for this method and implement functionality
-    public void setArtistImage() {}
-
     public void setArtistName(String artistName) {
         mArtistName.setText(artistName);
     }
 
     public void setArtistImage(String imageUrl) {
-
         Picasso.with(mContext).load(imageUrl).into(mArtistImage);
     }
 
@@ -63,4 +64,5 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder {
             setArtistImage(currentArtist.getArtistArtUrl());
         }
     }
+
 }

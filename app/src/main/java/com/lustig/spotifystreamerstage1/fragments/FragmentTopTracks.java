@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.lustig.spotifystreamerstage1.R;
-import com.lustig.spotifystreamerstage1.activities.TopTracksActivity;
 import com.lustig.spotifystreamerstage1.adapters.TrackAdapter;
 import com.lustig.spotifystreamerstage1.interfaces.TrackLoadingListener;
 import com.lustig.spotifystreamerstage1.model.CurrentScenario;
@@ -87,6 +86,11 @@ public class FragmentTopTracks extends Fragment implements TrackLoadingListener 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
+    public void clearTracks() {
+        mAdapter = new TrackAdapter(new TrackList(), getActivity());
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
     @Override
     public void onLoadingComplete(TrackList tracks) {
 
@@ -107,7 +111,7 @@ public class FragmentTopTracks extends Fragment implements TrackLoadingListener 
         mTracks = tracks;
 
         mAdapter = new TrackAdapter(mTracks, getActivity());
-        mAdapter.setOnTrackClickListener((TopTracksActivity) getActivity());
+        mAdapter.setOnTrackClickListener(getActivity());
 
         getActivity().runOnUiThread(
                 new Runnable() {

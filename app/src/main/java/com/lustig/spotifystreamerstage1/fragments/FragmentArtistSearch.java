@@ -113,7 +113,6 @@ public class FragmentArtistSearch extends Fragment {
                                                     @Override
                                                     public void run() {
                                                         if (mNoArtistToast != null) {
-
                                                             mNoArtistToast.cancel();
                                                         }
 
@@ -124,9 +123,13 @@ public class FragmentArtistSearch extends Fragment {
                                                                     "No artists found =(",
                                                                     Toast.LENGTH_SHORT);
                                                             mNoArtistToast.show();
+
+                                                            mAdapter = new ArtistAdapter(getActivity(), FragmentArtistSearch.this);
+                                                            ((MainActivity) getActivity()).clearTracks();
+                                                        } else {
+                                                            mAdapter = new ArtistAdapter(_artists, getActivity(), FragmentArtistSearch.this);
                                                         }
 
-                                                        mAdapter = new ArtistAdapter(_artists, getActivity());
                                                         mAdapter.setArtistClickListener((MainActivity) getActivity());
                                                         mRecyclerView.setAdapter(mAdapter);
                                                         mAdapter.notifyDataSetChanged();
@@ -161,7 +164,7 @@ public class FragmentArtistSearch extends Fragment {
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mAdapter = new ArtistAdapter(getActivity());
+        mAdapter = new ArtistAdapter(getActivity(), this);
 
         mAdapter.setArtistClickListener((MainActivity) getActivity());
 
@@ -182,6 +185,31 @@ public class FragmentArtistSearch extends Fragment {
 
         if (searchText != null) {
             mArtistSearch.setText(searchText);
+        }
+    }
+
+    public void updateSelections(int currentSelectedPosition, int previousSelectedPosition) {
+        clearPreviousSelection(previousSelectedPosition);
+        setCurrentSelection(currentSelectedPosition);
+    }
+
+    public void setCurrentSelection(int currentSelectedPosition) {
+
+        View currentSelectedView =
+                mRecyclerView.getLayoutManager().getChildAt(currentSelectedPosition);
+
+        if (null != currentSelectedView) {
+            currentSelectedView.setSelected(true);
+        }
+    }
+
+    public void clearPreviousSelection(int previousSelectedPosition) {
+
+        View previousSelectedView =
+                mRecyclerView.getLayoutManager().getChildAt(previousSelectedPosition);
+
+        if (null != previousSelectedView) {
+            previousSelectedView.setSelected(false);
         }
     }
 }

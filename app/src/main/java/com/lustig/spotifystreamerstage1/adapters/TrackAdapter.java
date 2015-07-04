@@ -1,6 +1,7 @@
 package com.lustig.spotifystreamerstage1.adapters;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -57,7 +58,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackViewHolder> {
         return mTracks.size();
     }
 
-    public void setOnTrackClickListener(OnTrackClickListener listener) {
-        mTrackClickListener = listener;
+    public void setOnTrackClickListener(Activity activity) {
+        mTrackClickListener = (OnTrackClickListener) activity;
     }
 }

@@ -34,6 +34,10 @@ public class TrackList {
 
     TrackLoadingListener mTrackLoadingListener;
 
+    public TrackList() {
+
+    }
+
     public TrackList(ArrayList<_Track> tracks,
                      _Artist artist,
                      Context context,
@@ -118,7 +122,7 @@ public class TrackList {
 
     public int size() {
 
-        return mTracks.size();
+        return null == mTracks ? 0 : mTracks.size();
     }
 
     public ArrayList<_Track> getTracks() {

@@ -3,6 +3,7 @@
     android:id="@+id/artistItemRoot"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
+    android:background="@drawable/selector_artist_row"
     xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <ImageView
