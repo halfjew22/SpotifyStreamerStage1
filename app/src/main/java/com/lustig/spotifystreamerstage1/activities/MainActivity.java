@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.lustig.spotifystreamerstage1.R;
+import com.lustig.spotifystreamerstage1.dialogs.MediaPlayerDialog;
 import com.lustig.spotifystreamerstage1.fragments.FragmentTopTracks;
 import com.lustig.spotifystreamerstage1.interfaces.OnArtistClickListener;
 import com.lustig.spotifystreamerstage1.interfaces.OnTrackClickListener;
@@ -105,11 +106,16 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
+        CurrentScenario.getInstance().setCurrentTrack(track);
+
         /**
          * If we are in two pane mode, eventually we want to show a
          * ***DIALOG** for the media player, rather than a full screen
          * Activity
          */
         Toast.makeText(this, track.getTitle(), Toast.LENGTH_SHORT).show();
+
+        MediaPlayerDialog mediaDialog = new MediaPlayerDialog();
+        mediaDialog.show(getSupportFragmentManager(), "dialog");
     }
 }
