@@ -56,9 +56,6 @@ public class TrackList {
             mTracks = loadTracksFromSharedPrefs();
         }
 
-
-
-
         // If, after attempting load from SP, we have 0 tracks, load from Internet
         if (mTracks.size() != 0) {
 
@@ -66,6 +63,7 @@ public class TrackList {
                 U.d(t.getTitle());
             }
 
+            CurrentScenario.getInstance().setCurrentTrackList(mTracks);
             U.d("Tracks loaded from SharedPrefs");
             mTrackLoadingListener.onLoadingComplete(this);
 
@@ -93,6 +91,7 @@ public class TrackList {
                                         add(new _Track(t));
                                     }
 
+                                    CurrentScenario.getInstance().setCurrentTrackList(mTracks);
                                     mTrackLoadingListener.onLoadingComplete(TrackList.this);
                                 }
 

@@ -41,6 +41,9 @@ public class _Artist {
         for (Image i : apiArtist.images) {
             mImageUrls.add(i.url);
         }
+
+        // Now I need to populate the list of tracks
+        
     }
 
     public _Artist(String name) {

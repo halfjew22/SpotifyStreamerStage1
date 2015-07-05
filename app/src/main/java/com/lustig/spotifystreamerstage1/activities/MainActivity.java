@@ -108,13 +108,6 @@ public class MainActivity extends AppCompatActivity
 
         CurrentScenario.getInstance().setCurrentTrack(track);
 
-        /**
-         * If we are in two pane mode, eventually we want to show a
-         * ***DIALOG** for the media player, rather than a full screen
-         * Activity
-         */
-        Toast.makeText(this, track.getTitle(), Toast.LENGTH_SHORT).show();
-
         MediaPlayerDialog mediaDialog = new MediaPlayerDialog();
         mediaDialog.show(getSupportFragmentManager(), "dialog");
     }
