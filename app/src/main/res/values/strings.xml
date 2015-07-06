@@ -6,4 +6,7 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="enter_artist_name">Enter an artist name</string>
     <string name="title_activity_top_tracks">Top Tracks</string>
+    <string name="title_activity_media_player">MediaPlayerActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

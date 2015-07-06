@@ -1,10 +1,12 @@
 package com.lustig.spotifystreamerstage1.dialogs;
 
+import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 import com.lustig.spotifystreamerstage1.R;
 import com.lustig.spotifystreamerstage1.model.CurrentScenario;
 import com.lustig.spotifystreamerstage1.model._Track;
+import com.lustig.spotifystreamerstage1.utility.TimeUtils;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -27,7 +30,7 @@ import com.squareup.picasso.Picasso;
  * <p/>
  * Regardless, the layout of the Fragment will be identical.
  */
-public class MediaPlayerDialog extends DialogFragment implements View.OnTouchListener {
+public class MediaPlayerDialog extends DialogFragment implements View.OnTouchListener, MediaPlayer.OnCompletionListener {
 
     boolean mIsPlaying = false;
     int mPreviewLength = 0;
@@ -48,6 +51,9 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
 
     private final Handler handler = new Handler();
 
+    private TextView mCurrentTimeTextView;
+    private TextView mPreviewDurationTextView;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,6 +69,8 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
         mSeekBar = (SeekBar) root.findViewById(R.id.seekBar);
         mSeekBar.setMax(99);
         mSeekBar.setOnTouchListener(this);
+
+        mPlayer.setOnCompletionListener(this);
 
         mPreviousTrackButton.setOnClickListener(
                 new View.OnClickListener() {
@@ -97,14 +105,6 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
         return root;
     }
 
-    @Override
-    public void onStart() {
-
-        super.onStart();
-
-        bindViews();
-        updateMediaPlayer();
-    }
 
     private void bindViews() {
 
@@ -112,7 +112,18 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
         mAlbumNameTextView = (TextView) getView().findViewById(R.id.album_name);
         mTrackNameTextView = (TextView) getView().findViewById(R.id.track_name);
 
+        mCurrentTimeTextView = (TextView) getView().findViewById(R.id.current_progress);
+        mPreviewDurationTextView = (TextView) getView().findViewById(R.id.preview_duration);
+
         mAlbumArtImageView = (ImageView) getView().findViewById(R.id.album_art);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        bindViews();
+        updateMediaPlayer();
     }
 
     private void updateMediaPlayer() {
@@ -123,8 +134,6 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
 
         setAlbumArt();
 
-        mPlayer.reset();
-
         try {
             mPlayer.setDataSource(CurrentScenario.getInstance().getCurrentTrack().getPreviewUrl());
             mPlayer.prepare();
@@ -134,9 +143,13 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
 
         mPreviewLength = mPlayer.getDuration();
 
-        updateSeekBar();
+        mPreviewDurationTextView
+                .setText(TimeUtils.minutesSecondsFromMilliseconds(mPreviewLength));
 
         mPlayer.start();
+
+        updateSeekBar();
+
         mTogglePlayButton.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
     }
 
@@ -144,9 +157,18 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
 
         int progress = (int) (((float) mPlayer.getCurrentPosition() / mPreviewLength) * 100);
 
+        int currentTimeMillis = progress * mPreviewLength / 100;
+
+        String timeMinutesSeconds =
+                TimeUtils.minutesSecondsFromMilliseconds(currentTimeMillis);
+
+        mCurrentTimeTextView.setText(timeMinutesSeconds);
+
         mSeekBar.setProgress(progress);
 
-        if (mPlayer.isPlaying()) {
+        boolean isPlaying = mPlayer.isPlaying();
+
+        if (isPlaying) {
             Runnable updateSeekBarRunnable = new Runnable() {
 
                 @Override
@@ -156,7 +178,6 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
             };
             handler.postDelayed(updateSeekBarRunnable, 1000);
         }
-
     }
 
     private void setArtistTextView() {
@@ -197,6 +218,7 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
             // Pause playback
             mPlayer.pause();
             mIsPlaying = false;
+            handler.removeCallbacksAndMessages(null);
 
         } else {
 
@@ -212,6 +234,8 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
 
             // Start playback
             mPlayer.start();
+
+            updateSeekBar();
 
             mIsPlaying = true;
         }
@@ -231,6 +255,7 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
          */
         if (nextTrack != null) {
             CurrentScenario.getInstance().setCurrentTrack(nextTrack);
+            mPlayer.reset();
             updateMediaPlayer();
         } else {
             Toast.makeText(getActivity(), "No more tracks =(", Toast.LENGTH_SHORT).show();
@@ -243,6 +268,7 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
 
         if (previousTrack != null) {
             CurrentScenario.getInstance().setCurrentTrack(previousTrack);
+            mPlayer.reset();
             updateMediaPlayer();
         } else {
             Toast.makeText(getActivity(), "Already on first track =(", Toast.LENGTH_SHORT).show();
@@ -254,10 +280,35 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
 
         if (v.getId() == R.id.seekBar) {
 
+            handler.removeCallbacksAndMessages(null);
             int playPositionMilliseconds = (mPreviewLength / 100) * mSeekBar.getProgress();
             mPlayer.seekTo(playPositionMilliseconds);
+            updateSeekBar();
         }
 
         return false;
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        Log.d("Lustig", "onCompletion");
+        playNextTrack();
+    }
+
+    public void stopMediaPlayer() {
+        handler.removeCallbacksAndMessages(null);
+
+        mPlayer.stop();
+        mPlayer.reset();
+
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+
+        stopMediaPlayer();
+        mPlayer.stop();
+        mPlayer.release();
     }
 }
