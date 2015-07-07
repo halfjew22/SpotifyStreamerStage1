@@ -58,6 +58,8 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        Log.d("Lustig", "onCreateView");
+
         View root = inflater.inflate(R.layout.media_player, container, false);
 
         mPlayer = new MediaPlayer();
@@ -135,6 +137,9 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
         setAlbumArt();
 
         try {
+            if (mPlayer == null) {
+                mPlayer = new MediaPlayer();
+            }
             mPlayer.setDataSource(CurrentScenario.getInstance().getCurrentTrack().getPreviewUrl());
             mPlayer.prepare();
         } catch (Exception e) {
@@ -298,9 +303,14 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
     public void stopMediaPlayer() {
         handler.removeCallbacksAndMessages(null);
 
-        mPlayer.stop();
-        mPlayer.reset();
+        if (null != mPlayer && mPlayer.isPlaying()) {
+            mPlayer.stop();
+            mPlayer.release();
+        }
 
+        mPlayer = null;
+
+        dismiss();
     }
 
     @Override
@@ -308,7 +318,5 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
         super.onDismiss(dialog);
 
         stopMediaPlayer();
-        mPlayer.stop();
-        mPlayer.release();
     }
 }

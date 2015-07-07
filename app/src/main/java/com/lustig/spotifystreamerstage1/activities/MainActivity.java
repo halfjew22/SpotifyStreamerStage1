@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity
 
     FragmentTopTracks mTopTracksFragment = null;
 
+    MediaPlayerDialog mMediaPlayer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -108,7 +110,11 @@ public class MainActivity extends AppCompatActivity
 
         CurrentScenario.getInstance().setCurrentTrack(track);
 
-        MediaPlayerDialog mediaDialog = new MediaPlayerDialog();
-        mediaDialog.show(getSupportFragmentManager(), "dialog");
+        if (mMediaPlayer != null) {
+            mMediaPlayer.stopMediaPlayer();
+        }
+
+        mMediaPlayer = new MediaPlayerDialog();
+        mMediaPlayer.show(getSupportFragmentManager(), "dialog");
     }
 }
