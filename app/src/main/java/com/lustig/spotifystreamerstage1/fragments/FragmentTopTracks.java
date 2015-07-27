@@ -118,27 +118,30 @@ public class FragmentTopTracks extends Fragment implements TrackLoadingListener 
         mAdapter = new TrackAdapter(mTracks, getActivity());
         mAdapter.setOnTrackClickListener(getActivity());
 
-        getActivity().runOnUiThread(
-                new Runnable() {
+        if (null != getActivity()) {
 
-                    @Override
-                    public void run() {
+            getActivity().runOnUiThread(
+                    new Runnable() {
+
+                        @Override
+                        public void run() {
 
 
-                        /**
-                         * Fixes DNMS for displaying a toast when
-                         * no tracks are found
-                         */
-                        if (mTracks.size() == 0) {
-                            if (mToast != null) {
-                                mToast.cancel();
+                            /**
+                             * Fixes DNMS for displaying a toast when
+                             * no tracks are found
+                             */
+                            if (mTracks.size() == 0) {
+                                if (mToast != null) {
+                                    mToast.cancel();
+                                }
+
+                                mToast.show();
                             }
 
-                            mToast.show();
+                            mRecyclerView.setAdapter(mAdapter);
                         }
-
-                        mRecyclerView.setAdapter(mAdapter);
-                    }
-                });
+                    });
+        }
     }
 }
