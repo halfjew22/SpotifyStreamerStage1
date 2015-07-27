@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.lustig.spotifystreamerstage1.R;
 import com.lustig.spotifystreamerstage1.adapters.TrackAdapter;
@@ -31,6 +32,8 @@ public class FragmentTopTracks extends Fragment implements TrackLoadingListener 
     TrackAdapter mAdapter;
 
     TrackList mTracks;
+
+    Toast mToast;
 
     public FragmentTopTracks() {
         // Required empty public constructor
@@ -66,6 +69,8 @@ public class FragmentTopTracks extends Fragment implements TrackLoadingListener 
         setUpRecyclerView();
 
         mTracks = new TrackList(mArtist, getActivity(), this);
+
+        mToast = Toast.makeText(getActivity(), "No tracks for this artist", Toast.LENGTH_SHORT);
 
         return mRootLayout;
     }
@@ -118,6 +123,19 @@ public class FragmentTopTracks extends Fragment implements TrackLoadingListener 
 
                     @Override
                     public void run() {
+
+
+                        /**
+                         * Fixes DNMS for displaying a toast when
+                         * no tracks are found
+                         */
+                        if (mTracks.size() == 0) {
+                            if (mToast != null) {
+                                mToast.cancel();
+                            }
+
+                            mToast.show();
+                        }
 
                         mRecyclerView.setAdapter(mAdapter);
                     }

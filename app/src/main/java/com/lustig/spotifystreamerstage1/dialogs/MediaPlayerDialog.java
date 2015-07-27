@@ -141,21 +141,32 @@ public class MediaPlayerDialog extends DialogFragment implements View.OnTouchLis
                 mPlayer = new MediaPlayer();
             }
             mPlayer.setDataSource(CurrentScenario.getInstance().getCurrentTrack().getPreviewUrl());
-            mPlayer.prepare();
+            mPlayer.prepareAsync();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        mPreviewLength = mPlayer.getDuration();
+        /**
+         * Fixes DNMS for preparation asynchronously.
+         */
+        mPlayer.setOnPreparedListener(
+                new MediaPlayer.OnPreparedListener() {
 
-        mPreviewDurationTextView
-                .setText(TimeUtils.minutesSecondsFromMilliseconds(mPreviewLength));
+                    @Override
+                    public void onPrepared(MediaPlayer mp) {
 
-        mPlayer.start();
+                        mPreviewLength = mPlayer.getDuration();
 
-        updateSeekBar();
+                        mPreviewDurationTextView
+                                .setText(TimeUtils.minutesSecondsFromMilliseconds(mPreviewLength));
 
-        mTogglePlayButton.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
+                        mPlayer.start();
+
+                        updateSeekBar();
+
+                        mTogglePlayButton.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
+                    }
+                });
     }
 
     private void updateSeekBar() {
